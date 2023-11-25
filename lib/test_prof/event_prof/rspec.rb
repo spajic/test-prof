@@ -5,6 +5,25 @@ require "test_prof/ext/string_truncate"
 
 module TestProf
   module EventProf
+    class MiniListener
+      attr_reader :current_group
+      def initialize
+        @current_group = nil
+      end
+
+      def example_group_started(notification)
+        return unless notification.group.top_level?
+
+        @current_group = notification.group
+      end
+
+      def example_group_finished(notification)
+        return unless notification.group.top_level?
+
+        @current_group = nil
+      end
+    end
+
     class RSpecListener # :nodoc:
       include Logging
       using FloatDuration
@@ -24,6 +43,7 @@ module TestProf
       end
 
       def example_group_started(notification)
+        puts "✅✅✅ #{notification.group}"
         return unless notification.group.top_level?
         @profiler.group_started notification.group
       end

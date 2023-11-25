@@ -16,13 +16,18 @@ module TestProf
       def initialize
         @collectors = []
 
-        if RSpecDissect.config.let?
-          collectors << Collectors::Let.new(top_count: RSpecDissect.config.top_count)
-        end
+        # if RSpecDissect.config.let?
+        #   collectors << Collectors::Let.new(top_count: RSpecDissect.config.top_count)
+        # end
 
-        if RSpecDissect.config.before?
-          collectors << Collectors::Before.new(top_count: RSpecDissect.config.top_count)
-        end
+        # if RSpecDissect.config.before?
+        #   collectors << Collectors::Before.new(top_count: RSpecDissect.config.top_count)
+        # end
+
+        collectors << Collectors::TargetFactory.new(
+          top_count: RSpecDissect.config.top_count,
+          target_factory: 'User'
+        )
 
         @examples_count = 0
         @examples_time = 0.0

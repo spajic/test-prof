@@ -3,8 +3,19 @@
 module TestProf
   module EventProf
     class Profiler # :nodoc:
-      attr_reader :event, :total_count, :total_time, :rank_by, :top_count, :per_example,
-        :time, :count, :example_time, :example_count, :absolute_run_time
+      attr_reader(
+        :event,
+        :total_count,
+        :total_time,
+        :rank_by,
+        :top_count,
+        :per_example,
+        :time,
+        :count,
+        :example_time,
+        :example_count,
+        :absolute_run_time
+      )
 
       alias_method :per_example?, :per_example
 

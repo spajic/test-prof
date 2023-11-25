@@ -78,10 +78,15 @@ module TestProf
       config.before(:begin) do
         next unless ::ActiveRecord::Base.connection.pool.respond_to?(:lock_thread=)
         instance_variable_set("#{PREFIX_RESTORE_LOCK_THREAD}_orig_lock_thread", ::ActiveRecord::Base.connection.pool.instance_variable_get(:@lock_thread)) unless instance_variable_defined? "#{PREFIX_RESTORE_LOCK_THREAD}_orig_lock_thread"
-        ::ActiveRecord::Base.connection.pool.lock_thread = true
+        # ::ActiveRecord::Base.connection.pool.lock_thread = true
+        Adapters::ActiveRecord.all_connections.each do |con|
+          # puts "VOVA BEGIN LOCK_THREAD"
+          con.pool.lock_thread = true
+        end
       end
 
       config.after(:rollback) do
+        # puts "VOVA ROLLBACK LOCK_THREAD"
         next unless ::ActiveRecord::Base.connection.pool.respond_to?(:lock_thread=)
         ::ActiveRecord::Base.connection.pool.lock_thread = instance_variable_get("#{PREFIX_RESTORE_LOCK_THREAD}_orig_lock_thread")
       end

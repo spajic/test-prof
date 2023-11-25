@@ -3,8 +3,12 @@
 require "test_prof/factory_prof/printers/simple"
 require "test_prof/factory_prof/printers/flamegraph"
 require "test_prof/factory_prof/printers/nate_heckler"
+require "test_prof/factory_prof/printers/spajic"
 require "test_prof/factory_prof/factory_builders/factory_bot"
 require "test_prof/factory_prof/factory_builders/fabrication"
+
+# Subscribe with RSpecListener to events of group's start and finish
+$mini_listener = TestProf::EventProf::MiniListener.new
 
 module TestProf
   # FactoryProf collects "factory stacks" that can be used to build
@@ -18,13 +22,15 @@ module TestProf
       attr_accessor :mode, :printer
 
       def initialize
-        @mode = (ENV["FPROF"] == "flamegraph") ? :flamegraph : :simple
+        @mode = (ENV["FPROF"].in?(["flamegraph", "spajic"])) ? :flamegraph : :simple
         @printer =
           case ENV["FPROF"]
           when "flamegraph"
             Printers::Flamegraph
           when "nate_heckler"
             Printers::NateHeckler
+          when "spajic"
+            Printers::Spajic
           else
             Printers::Simple
           end
@@ -166,7 +172,11 @@ module TestProf
 
       def flush_stack
         return unless config.flamegraph?
-        @stacks << @current_stack unless @current_stack.nil? || @current_stack.empty?
+        stack_with_location = {
+          location: $mini_listener.current_group&.location,
+          stack: @current_stack
+        }
+        @stacks << stack_with_location unless @current_stack.nil? || @current_stack.empty?
         @current_stack = []
       end
 
@@ -178,5 +188,14 @@ module TestProf
 end
 
 TestProf.activate("FPROF") do
+  RSpec.configure do |config|
+    config.before(:suite) do
+      listener = $mini_listener
+      config.reporter.register_listener(
+        listener, *[:example_group_started, :example_group_finished]
+      )
+    end
+  end
+
   TestProf::FactoryProf.run
 end
