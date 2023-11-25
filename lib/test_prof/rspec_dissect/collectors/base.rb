@@ -13,7 +13,7 @@ module TestProf # :nodoc: all
       class Base
         attr_reader :results, :name, :top_count
 
-        def initialize(name:, top_count:)
+        def initialize(name:, top_count:, **params)
           @name = name
           @top_count = top_count
           @results = Utils::SizedOrderedSet.new(

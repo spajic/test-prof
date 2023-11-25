@@ -139,6 +139,7 @@ end
 
 require "test_prof/rspec_dissect/collectors/let"
 require "test_prof/rspec_dissect/collectors/before"
+require "test_prof/rspec_dissect/collectors/target_factory"
 require "test_prof/rspec_dissect/rspec"
 
 TestProf.activate("RD_PROF") do

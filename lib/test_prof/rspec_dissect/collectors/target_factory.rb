@@ -6,9 +6,10 @@ require 'pry'
 module TestProf
   module RSpecDissect
     module Collectors # :nodoc: all
-      class Let < Base
+      class TargetFactory < Base
         def initialize(**params)
-          super(name: :let, **params)
+          @target_factory = params.fetch(:target_factory)
+          super(name: :target_factory, **params)
         end
 
         def populate!(data)
@@ -17,14 +18,13 @@ module TestProf
         end
 
         def print_results
-          return unless RSpecDissect.memoization_available?
+          # return unless RSpecDissect.memoization_available?
           super
         end
 
         def print_group_result(group)
-          return super unless RSpecDissect.config.let_stats_enabled?
+          # return super unless RSpecDissect.config.let_stats_enabled?
           msgs = [super]
-          group[:let_calls]
             .group_by(&:itself)
             .map { |id, calls| [id, -calls.size] }
             .sort_by(&:last)

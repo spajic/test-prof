@@ -18,6 +18,7 @@ module TestProf
       attr_accessor :adapter
 
       def begin_transaction(scope = nil, metadata = [])
+        # puts "BEFORE_ALL BEGIN TRANSACTION"
         raise AdapterMissing if adapter.nil?
 
         config.run_hooks(:begin, scope, metadata) do
@@ -27,6 +28,7 @@ module TestProf
       end
 
       def rollback_transaction(scope = nil, metadata = [])
+        # puts "BEFORE_ALL ROLLBACK TRANSACTION"
         raise AdapterMissing if adapter.nil?
 
         config.run_hooks(:rollback, scope, metadata) do
